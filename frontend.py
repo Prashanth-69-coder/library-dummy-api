@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-BASE_URL = "http://localhost:8000"  
+BASE_URL = "https://library-backend.onrender.com"  # Update after deployment if needed
 
 def signup(username, password):
     response = requests.post(f"{BASE_URL}/signup", params={"username": username, "password": password})
@@ -66,22 +66,16 @@ elif choice == "Login":
 
 elif choice == "Logout":
     st.subheader("Logout")
-
     username = st.text_input("Username for logout")
     password = st.text_input("Password for logout", type='password')
-
     if st.button("Logout"):
-        if username and password:
-            result = logout(username, password)
-            if "successfully" in result.get("message", ""):
-                st.session_state.logged_in = False
-                st.session_state.user = {}
-                st.success(result.get("message"))
-            else:
-                st.error(result.get("message"))
+        result = logout(username, password)
+        if "successfully" in result.get("message", ""):
+            st.session_state.logged_in = False
+            st.session_state.user = {}
+            st.success(result.get("message"))
         else:
-            st.warning("Please enter username and password to logout.")
-
+            st.error(result.get("message"))
 
 elif choice == "View Books":
     st.subheader("Available Books")
@@ -100,10 +94,7 @@ elif choice == "Borrow Book":
         count = st.number_input("Count (only 1 accepted)", value=1, min_value=1, max_value=1)
         if st.button("Borrow"):
             result = borrow_book(user_id, book_id, count)
-            if "successfully" in result.get("message", ""):
-                st.success(result.get("message"))
-            else:
-                st.error(result.get("message"))
+            st.success(result.get("message")) if "successfully" in result.get("message", "") else st.error(result.get("message"))
     else:
         st.info("Please login to borrow books.")
 
@@ -114,10 +105,7 @@ elif choice == "Return Book":
         book_id = st.number_input("Enter Book ID to return", min_value=1, key="return_book_id")
         if st.button("Return"):
             result = submit_book(user_id, book_id)
-            if "successfully" in result.get("message", ""):
-                st.success(result.get("message"))
-            else:
-                st.error(result.get("message"))
+            st.success(result.get("message")) if "successfully" in result.get("message", "") else st.error(result.get("message"))
     else:
         st.info("Please login to return books.")
 
